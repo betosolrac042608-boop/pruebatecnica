@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActividadResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\Actividad;
 use App\Models\Animal;
 use App\Models\Cultivo;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 
 class ActividadResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = Actividad::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';

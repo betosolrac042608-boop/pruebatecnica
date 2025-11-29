@@ -15,7 +15,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (auth()->check()) {
+        $user = auth()->user();
+        
+        // Si es Operador o Supervisor, redirigir a su página principal
+        if ($user && $user->rol_id) {
+            if (!$user->relationLoaded('rol')) {
+                $user->load('rol');
+            }
+            
+            if ($user->rol && in_array($user->rol->nombre, ['Operador', 'Supervisor'])) {
+                return redirect('/admin/plan-trabajo-operario');
+            }
+        }
+        
         return redirect('/admin');
     }
     return redirect('/admin/login');
 });
+
+Route::get('/login', function () {
+    return redirect()->route('filament.admin.auth.login');
+})->name('login');

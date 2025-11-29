@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AnimalResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\Animal;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +13,7 @@ use Filament\Tables\Table;
 
 class AnimalResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = Animal::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
@@ -103,10 +105,28 @@ class AnimalResource extends Resource
                             ->minValue(0)
                             ->step(0.01),
                         
+                        Forms\Components\TextInput::make('valor_estimado')
+                            ->label('Valor Estimado')
+                            ->numeric()
+                            ->prefix('$')
+                            ->placeholder('Ej: 5000')
+                            ->minValue(0)
+                            ->step(0.01)
+                            ->helperText('Valor estimado del animal'),
+                        
                         Forms\Components\TextInput::make('ubicacion')
                             ->label('Ubicación')
                             ->maxLength(100)
                             ->placeholder('Ej: Corral Norte'),
+                        
+                        Forms\Components\Select::make('zona_id')
+                            ->label('Zona')
+                            ->relationship('zona', 'nombre', fn ($query) => $query->with('predio')->where('activo', true))
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->predio ? $record->predio->nombre . ' - ' : '') . $record->nombre)
+                            ->placeholder('Seleccione una zona')
+                            ->helperText('Zona del predio a la que pertenece el animal'),
                         
                         Forms\Components\DatePicker::make('fecha_nacimiento')
                             ->label('Fecha de Nacimiento')
@@ -207,6 +227,13 @@ class AnimalResource extends Resource
                     ->sortable()
                     ->placeholder('-'),
                 
+                Tables\Columns\TextColumn::make('valor_estimado')
+                    ->label('Valor Estimado')
+                    ->money('USD')
+                    ->sortable()
+                    ->placeholder('-')
+                    ->toggleable(),
+                
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
@@ -218,6 +245,16 @@ class AnimalResource extends Resource
                         'Fallecido' => 'gray',
                         default => 'gray',
                     }),
+                
+                Tables\Columns\TextColumn::make('zona.nombre')
+                    ->label('Zona')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn ($record) => $record->zona ? $record->zona->predio->nombre . ' - ' . $record->zona->nombre : '-')
+                    ->placeholder('Sin zona')
+                    ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('ubicacion')
                     ->label('Ubicación')
@@ -270,6 +307,12 @@ class AnimalResource extends Resource
                         'M' => 'Macho',
                         'H' => 'Hembra',
                     ]),
+                
+                Tables\Filters\SelectFilter::make('zona_id')
+                    ->label('Zona')
+                    ->relationship('zona', 'nombre')
+                    ->multiple()
+                    ->preload(),
                 
                 Tables\Filters\TrashedFilter::make()
                     ->label('Eliminados'),

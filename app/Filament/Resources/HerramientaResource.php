@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\HerramientaResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\Herramienta;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +13,7 @@ use Filament\Tables\Table;
 
 class HerramientaResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = Herramienta::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
@@ -99,6 +101,15 @@ class HerramientaResource extends Resource
                             ->label('Ubicación')
                             ->maxLength(100)
                             ->placeholder('Ej: Bodega Principal'),
+                        
+                        Forms\Components\Select::make('zona_id')
+                            ->label('Zona')
+                            ->relationship('zona', 'nombre', fn ($query) => $query->with('predio')->where('activo', true))
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->predio ? $record->predio->nombre . ' - ' : '') . $record->nombre)
+                            ->placeholder('Seleccione una zona')
+                            ->helperText('Zona del predio a la que pertenece la herramienta'),
                     ])->columns(2),
                 
                 Forms\Components\Section::make('Información Financiera y Responsable')
@@ -210,6 +221,16 @@ class HerramientaResource extends Resource
                     ->placeholder('Sin asignar')
                     ->toggleable(),
                 
+                Tables\Columns\TextColumn::make('zona.nombre')
+                    ->label('Zona')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn ($record) => $record->zona ? $record->zona->predio->nombre . ' - ' . $record->zona->nombre : '-')
+                    ->placeholder('Sin zona')
+                    ->toggleable(),
+                
                 Tables\Columns\TextColumn::make('ubicacion')
                     ->label('Ubicación')
                     ->searchable()
@@ -265,6 +286,12 @@ class HerramientaResource extends Resource
                 Tables\Filters\SelectFilter::make('responsable_id')
                     ->label('Responsable')
                     ->relationship('responsable', 'name')
+                    ->multiple()
+                    ->preload(),
+                
+                Tables\Filters\SelectFilter::make('zona_id')
+                    ->label('Zona')
+                    ->relationship('zona', 'nombre')
                     ->multiple()
                     ->preload(),
                 

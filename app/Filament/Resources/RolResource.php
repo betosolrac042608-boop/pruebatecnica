@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RolResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\Rol;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +13,7 @@ use Filament\Tables\Table;
 
 class RolResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = Rol::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';

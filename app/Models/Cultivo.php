@@ -18,8 +18,10 @@ class Cultivo extends Model
         'tipo',
         'especie',
         'area',
+        'valor_estimado',
         'estado',
         'ubicacion',
+        'zona_id',
         'fecha_siembra',
         'fecha_estimada_cosecha',
         'ultima_fertilizacion',
@@ -32,8 +34,17 @@ class Cultivo extends Model
         'fecha_estimada_cosecha' => 'date',
         'ultima_fertilizacion' => 'date',
         'ultimo_riego' => 'date',
-        'area' => 'decimal:2'
+        'area' => 'decimal:2',
+        'valor_estimado' => 'decimal:2'
     ];
+
+    /**
+     * Obtener la zona a la que pertenece el cultivo.
+     */
+    public function zona()
+    {
+        return $this->belongsTo(Zona::class);
+    }
 
     /**
      * Obtener las actividades relacionadas con este cultivo.

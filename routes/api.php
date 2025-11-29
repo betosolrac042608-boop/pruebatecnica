@@ -23,6 +23,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:sanctum')->prefix('plan-trabajo')->group(function () {
+    Route::post('generar', [\App\Http\Controllers\Api\PlanTrabajoController::class, 'planInicial']);
+    Route::post('foto', [\App\Http\Controllers\Api\PlanTrabajoController::class, 'subirFoto']);
+    Route::post('evaluacion', [\App\Http\Controllers\Api\PlanTrabajoController::class, 'evaluarPlan']);
+});
+
 // Rutas públicas de la API (puedes agregar middleware auth:sanctum si necesitas autenticación)
 Route::prefix('v1')->group(function () {
     // Gestión de Animales

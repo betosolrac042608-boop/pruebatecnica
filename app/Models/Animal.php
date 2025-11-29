@@ -21,8 +21,10 @@ class Animal extends Model
         'fecha_adquisicion',
         'sexo',
         'peso',
+        'valor_estimado',
         'estado',
         'ubicacion',
+        'zona_id',
         'ultima_revision',
         'ultima_vacuna',
         'observaciones'
@@ -33,8 +35,17 @@ class Animal extends Model
         'fecha_adquisicion' => 'date',
         'ultima_revision' => 'date',
         'ultima_vacuna' => 'date',
-        'peso' => 'decimal:2'
+        'peso' => 'decimal:2',
+        'valor_estimado' => 'decimal:2'
     ];
+
+    /**
+     * Obtener la zona a la que pertenece el animal.
+     */
+    public function zona()
+    {
+        return $this->belongsTo(Zona::class);
+    }
 
     /**
      * Obtener las actividades relacionadas con este animal.

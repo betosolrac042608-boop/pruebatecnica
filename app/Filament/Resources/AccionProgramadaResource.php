@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AccionProgramadaResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\AccionProgramada;
 use App\Models\Animal;
 use App\Models\Cultivo;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 
 class AccionProgramadaResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = AccionProgramada::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';

@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
+        'verify_ssl' => env('OPENAI_VERIFY_SSL', false),
+        'cacert' => env('OPENAI_CACERT_PATH'),
+    ],
+
 ];

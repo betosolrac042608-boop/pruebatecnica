@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\User;
 use App\Models\Rol;
 use Filament\Forms;
@@ -15,6 +16,7 @@ use Filament\Notifications\Notification;
 
 class UserResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';

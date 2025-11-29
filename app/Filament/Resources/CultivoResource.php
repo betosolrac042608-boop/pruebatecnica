@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CultivoResource\Pages;
+use App\Filament\Concerns\HideFromOperarioSupervisor;
 use App\Models\Cultivo;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +13,7 @@ use Filament\Tables\Table;
 
 class CultivoResource extends Resource
 {
+    use HideFromOperarioSupervisor;
     protected static ?string $model = Cultivo::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-sparkles';
@@ -91,6 +93,15 @@ class CultivoResource extends Resource
                                 'required' => 'El área es obligatoria.',
                             ]),
                         
+                        Forms\Components\TextInput::make('valor_estimado')
+                            ->label('Valor Estimado')
+                            ->numeric()
+                            ->prefix('$')
+                            ->placeholder('Ej: 10000')
+                            ->minValue(0)
+                            ->step(0.01)
+                            ->helperText('Valor estimado del cultivo'),
+                        
                         Forms\Components\Select::make('estado')
                             ->label('Estado')
                             ->required()
@@ -109,6 +120,15 @@ class CultivoResource extends Resource
                 
                 Forms\Components\Section::make('Ubicación y Fechas')
                     ->schema([
+                        Forms\Components\Select::make('zona_id')
+                            ->label('Zona')
+                            ->relationship('zona', 'nombre', fn ($query) => $query->with('predio')->where('activo', true))
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => ($record->predio ? $record->predio->nombre . ' - ' : '') . $record->nombre)
+                            ->placeholder('Seleccione una zona')
+                            ->helperText('Zona del predio a la que pertenece el cultivo'),
+                        
                         Forms\Components\TextInput::make('ubicacion')
                             ->label('Ubicación')
                             ->required()
@@ -192,6 +212,13 @@ class CultivoResource extends Resource
                     ->suffix(' ha')
                     ->sortable(),
                 
+                Tables\Columns\TextColumn::make('valor_estimado')
+                    ->label('Valor Estimado')
+                    ->money('USD')
+                    ->sortable()
+                    ->placeholder('-')
+                    ->toggleable(),
+                
                 Tables\Columns\TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
@@ -204,6 +231,16 @@ class CultivoResource extends Resource
                         'En Descanso' => 'secondary',
                         default => 'gray',
                     }),
+                
+                Tables\Columns\TextColumn::make('zona.nombre')
+                    ->label('Zona')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info')
+                    ->formatStateUsing(fn ($record) => $record->zona ? $record->zona->predio->nombre . ' - ' . $record->zona->nombre : '-')
+                    ->placeholder('Sin zona')
+                    ->toggleable(),
                 
                 Tables\Columns\TextColumn::make('ubicacion')
                     ->label('Ubicación')
@@ -255,6 +292,12 @@ class CultivoResource extends Resource
                         'En Descanso' => 'En Descanso',
                     ])
                     ->multiple(),
+                
+                Tables\Filters\SelectFilter::make('zona_id')
+                    ->label('Zona')
+                    ->relationship('zona', 'nombre')
+                    ->multiple()
+                    ->preload(),
                 
                 Tables\Filters\TrashedFilter::make()
                     ->label('Eliminados'),

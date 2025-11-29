@@ -24,6 +24,7 @@ class Herramienta extends Model
         'fecha_adquisicion',
         'valor',
         'responsable_id',
+        'zona_id',
         'ultimo_mantenimiento',
         'proximo_mantenimiento',
         'observaciones'
@@ -42,6 +43,14 @@ class Herramienta extends Model
     public function responsable()
     {
         return $this->belongsTo(User::class, 'responsable_id');
+    }
+
+    /**
+     * Obtener la zona a la que pertenece la herramienta.
+     */
+    public function zona()
+    {
+        return $this->belongsTo(Zona::class);
     }
 
     /**

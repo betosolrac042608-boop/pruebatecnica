@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(\Filament\Pages\Auth\Login::class)
+            ->login(\App\Filament\Pages\Auth\Login::class)
             ->colors([
                 'primary' => Color::Emerald,
                 'danger' => Color::Rose,
@@ -41,8 +41,10 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->sidebarCollapsibleOnDesktop(false)
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Pages\PlanTrabajoOperario::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -58,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\RedirectToPlanTrabajo::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -66,4 +69,3 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotificationsPolling('30s');
     }
 }
-

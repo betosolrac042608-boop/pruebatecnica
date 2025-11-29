@@ -118,6 +118,30 @@ php artisan serve
 ```cmd
 npm run build
 php artisan optimize:clear
+
+## Plan de trabajo diario con IA
+
+Este proyecto ahora genera un plan diario por predio enviando las tareas por zona al modelo GPT (OpenAI). Para activar la integración debes configurar la clave en el archivo `.env`:
+
+```dotenv
+OPENAI_API_KEY=sk-xxxx…
+OPENAI_MODEL=gpt-3.5-turbo
+OPENAI_VERIFY_SSL=false
+```
+
+La clave se utiliza en `ChatGptService`, y el modelo por defecto es `gpt-3.5-turbo` (puedes cambiarlo a `gpt-4-turbo` si tienes acceso). Si la clave no está disponible el sistema vuelve a un plan básico local.
+
+**Nota:** El sistema usa `gpt-3.5-turbo` por defecto y no incluye parámetros de temperatura ni max_tokens para permitir que el modelo use sus valores predeterminados optimizados.
+
+Cuando el administrador crea un `PlanTrabajoDiario`, el job `EnviarPlanTrabajoAGptJob` envía automáticamente las tareas por zona a ChatGPT y guarda el JSON resultante en la base. Si deseas crear el plan por API:
+
+```bash
+curl -X POST /api/plan-trabajo/generar \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "predio_id=1&fecha=2025-11-25&rol_encargado=Eduardo&turno_inicio=07:30&turno_fin=18:00&comida_inicio=14:00&comida_fin=15:30"
+```
+
+Los roles `supervisor` y `operario` ven los planes, pero solo el admin puede crearlos. Luego puedes subir fotos (antes y después) con `/api/plan-trabajo/foto` y registrar evaluaciones de IA con `/api/plan-trabajo/evaluacion`.
 ```
 
 **Error de base de datos:**
